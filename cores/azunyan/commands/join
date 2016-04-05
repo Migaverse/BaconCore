@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Allows bot admins to make the bot join a channel.
+
+[ -n "$1" ] || { echo "usage: join <channel>"; exit 1; }
+
+REQOP=`echo $RAWNAME | cut -d ":" -f2`
+
+if cat "$PWD/etc/opauthuser" | grep -q $REQOP
+then
+	send "JOIN $1"
+else
+        echo "You are not authorized to run this command."
+fi
+

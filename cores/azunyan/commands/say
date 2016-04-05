@@ -1,0 +1,6 @@
+#!/bin/bash
+# Repeat after me!
+
+[ -n "$1" ] || { echo "usage: say <string>"; exit 1; }
+
+echo "$@"

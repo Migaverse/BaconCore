@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Bash command-line for bot administrators only.
+
+[ -n "$1" ] || { echo "usage: bash <command> - don't get any funny ideas, command limited to bot admins only"; exit 1; }
+
+REQOP=`echo $RAWNAME | cut -d ":" -f2`
+
+if cat "$PWD/etc/opauthuser" | grep -q $REQOP
+then
+	/bin/bash -c "$*" 2>&1
+else
+        echo "You are definitely not authorized to run this command."
+fi
+

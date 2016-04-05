@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+[ -n "$1" ] || { echo "usage: thoughtadd <string>"; exit 1; }
+
+thoughtfile=$PWD/etc/thoughtlist
+
+echo $@ >> $thoughtfile
+echo "Thought has been added."

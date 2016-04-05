@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Simple 'is it down or just me' script.
+
+if [[ `ping -c 1 -W 5 $1 | grep packet | cut -d ' ' -f6 | cut -d '%' -f1` = 0 ]]
+then
+   echo "$1 appears to be up."
+else
+   echo "$1 doesn't appear to be up or is not responding to ping requests."
+fi

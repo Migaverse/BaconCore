@@ -1,0 +1,5 @@
+#!/bin/bash
+# Shows the current commands available (ones that are set to +x).
+
+cd $PWD/commands/
+echo "Current commands available: `find . -maxdepth 1 -type f -executable | cut -c 3- | sed ':a;N;$!ba;s/\n/, /g'`"

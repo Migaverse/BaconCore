@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Allows bot admins to make the bot part a channel.
+
+[ -n "$1" ] || { echo "usage: part <channel>"; exit 1; }
+
+REQOP=`echo $RAWNAME | cut -d ":" -f2`
+
+if cat "$PWD/etc/opauthuser" | grep -q $REQOP
+then
+	[ -n "$1" ] && CHANNEL=$1
+	send "PART $CHANNEL"
+else
+        echo "You are not authorized to run this command."
+fi
+

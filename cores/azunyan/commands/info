@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+echo "$VERSION running core $nick on `lsb_release -s -d`"
+
+#[ -d .git ] && {
+#   echo -n "... working directory currently at commit ";
+#   git rev-parse HEAD
+#}

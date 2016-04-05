@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+echo $RAWNAME | cut -d ":" -f2 | cut -d "@" -f2

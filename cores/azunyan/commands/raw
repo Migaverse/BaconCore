@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Allows bot admins to send raw IRC lines.
+
+[ -n "$1" ] || { echo "usage: raw <command> - don't get any funny ideas, command limited to bot admins only"; exit 1; }
+
+REQOP=`echo $RAWNAME | cut -d ":" -f2`
+
+if cat "$PWD/etc/opauthuser" | grep -q $REQOP
+then
+	send -- "$*"
+else
+        echo "You are not authorized to run this command."
+fi

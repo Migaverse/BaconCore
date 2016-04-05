@@ -1,0 +1,2 @@
+* Add in some form of auto-rejoin-on-kick (perhaps rejoin twice then give up after third)
+* Make it possible to manually control bot via terminal possibly maybe perhaps

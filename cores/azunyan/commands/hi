@@ -1,0 +1,4 @@
+#!/bin/bash
+# Example "Hello" script
+
+echo "Hello $NAME!"

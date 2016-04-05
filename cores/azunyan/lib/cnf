@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+cnf=(
+
+	"No results, for meow."   
+	"No results for nyaa."
+	"No results right neow."
+	"I can't do that right meow!"
+	"nyoooooooooo :<"
+
+)
+
+echo ${cnf[$((RANDOM % ${#cnf[@]}))]}

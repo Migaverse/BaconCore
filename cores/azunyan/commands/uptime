@@ -1,0 +1,4 @@
+#!/bin/bash
+# Shows the hostname and the uptime.
+
+echo `hostname` `uptime`

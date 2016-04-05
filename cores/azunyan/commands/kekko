@@ -1,0 +1,6 @@
+#!/bin/bash
+# Makes the bot kek
+
+RNG=$((RANDOM % 150))
+kekko=`cat /dev/urandom | tr -dc "KEO" | head -c $RNG`
+printf "$kekko\n"

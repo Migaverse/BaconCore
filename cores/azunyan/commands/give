@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [[ $1 = "me" ]]
+then
+	echo "ACTION gives $NAME `echo $@ | cut -d ' ' -f2-`"
+else
+	echo "ACTION gives $@"
+fi
+exit 0

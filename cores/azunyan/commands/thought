@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+thoughtfile=$PWD/etc/thoughtlist
+shuf -n 1 $thoughtfile

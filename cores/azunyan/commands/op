@@ -1,0 +1,19 @@
+#!/bin/bash
+# Allows bot admins to op themselves from channels the bot was told to in opauthchan.
+
+[ -n "$1" ] || { echo "usage: op <user>"; exit 1; }
+
+REQOP=`echo $RAWNAME | cut -d ":" -f2`
+#echo "$REQOP"
+
+if cat "$PWD/etc/opauthuser" | grep -q $REQOP
+then
+	if cat "$PWD/etc/opauthchan" | grep -q $CHANNEL
+	then
+		send "MODE $CHANNEL +o $1"
+	else
+		echo "I'm not authorized to op users in this channel."
+	fi
+else
+	echo "You are not authorized to run this command."
+fi

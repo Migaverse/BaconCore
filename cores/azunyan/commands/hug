@@ -1,0 +1,11 @@
+#!/bin/bash
+
+[ -n "$1" ] || { echo "usage: hug <huggee>"; exit 1; }
+
+if [[ $1 = "me" ]]
+then
+	echo "ACTION hugs $NAME"
+else
+	echo "ACTION hugs $@"
+fi
+exit 0

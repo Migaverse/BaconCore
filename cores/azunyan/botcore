@@ -1,0 +1,200 @@
+#!/usr/bin/env bash
+# Copyright (C) 2012 Josh Cartwright <joshc@linux.com>
+# Copyright (C) 2015-2016 Miga <miga@migaverse.xyz>
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of
+# this software and associated documentation files (the "Software"), to deal in
+# the Software without restriction, including without limitation the rights to
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+# of the Software, and to permit persons to whom the Software is furnished to do
+# so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+# Set the version.
+VERSION="BaconCore NG 0.2"
+echo "$VERSION is starting up!"
+
+# Try to find baconcore.config and load it.
+# If we can't find it, create a new config file.
+[ -r baconcore.config ] || cat >baconcore.config <<-EOF
+	nick=Azunyan_OpenSource
+	real="Azusa Nakano Open Source"
+	server=irc.esper.net
+	port=6667
+	nickserv_pass=
+	chans=( "#!/bin/bash" )
+EOF
+
+# Source baconcore.config.
+source baconcore.config
+
+# Basic helpers for communication with via IRC protocol
+recv() { echo "< $@" >&2; }
+send() { echo "> $@" >&2;
+	printf "%s\r\n" "$@" >&3; }
+export -f send
+
+# Filters -- commands that are run using !command.
+declare -A filters
+reload_filters() {
+	for i in "${!filters[@]}"; do
+		unset "filters[$i]"
+	done
+	for f in filters/*; do
+		source "$f"
+	done
+}
+
+filter() {
+	filters["$1"]+="${@:2}"
+}
+export -f filter
+
+run_filters() {
+	for f in "${!filters[@]}"; do
+		if [[ "$@" =~ $f ]]; then
+			for func in ${filters[$f]}; do
+				$func "${BASH_REMATCH[@]}"
+			done
+		fi
+	done
+}
+
+reload_filters
+
+declare -A builtin_commands
+
+baconcore_args=("$0" "$@")
+
+# Built-in functions.
+builtin_reload()
+{
+	wait
+	send "QUIT :BaconCore is reloading."
+	exec 3>&-
+	exec "${baconcore_args[@]}"
+}
+builtin_commands[reload]=builtin_reload
+
+builtin_filters()
+{
+	echo "active filters:";
+	for f in "${!filters[@]}"; do
+		printf "%-20s: %s\n" "$f" "${filters[$f]}"
+	done
+}
+builtin_commands[filters]=builtin_filters
+
+builtin_list()
+{
+	echo -n "available commands: ${!builtin_commands[@]} "
+	(cd commands; echo *;)
+}
+builtin_commands[list]=builtin_list
+
+# We'll also allow for SIGHUP to reload BaconCore. Useful for git hooks.
+[ -e $name.pid ] && rm $name.pid
+echo $$ >$name.pid
+trap 'builtin_reload' SIGHUP
+
+# Start the main process.
+exec 3<>/dev/tcp/$server/$port || { echo "Could not connect"; exit 1; }
+
+send "NICK $nick"
+send "USER $nick 8 * :$real"
+
+CHANNEL=
+NAME=
+BOTNICK=$nick
+export CHANNEL NAME BOTNICK
+
+# This is our main loop.
+while read -r line; do
+
+	# strip trailing carriage return
+	line=${line%%$'\r'}
+
+	recv "$line"
+	set -- $line
+
+	case "$1" in
+	:*)
+		# Turn :nickname!example.host.com into nickname
+		RAWNAME=$1
+		NAME=${1%%!*}
+		NAME=${NAME#:}
+		shift
+	;;
+
+	esac
+
+	case "$@" in
+	"PING "*)
+		send "PONG $2"
+		continue
+	;;
+
+	"MODE $nick :+i"*)
+		# There has to be a better way to do this
+		send "PRIVMSG NickServ :IDENTIFY $nickserv_pass"
+		for chan in "${chans[@]}"; do
+			send "JOIN :$chan"
+		done &
+	;;
+
+	"PRIVMSG $nick :"*)
+		# private message to bot
+		CHANNEL=$NAME
+		prefix="PRIVMSG $NAME :"
+		set -- "${3#:}" "${@:4}"
+	;;
+
+	"PRIVMSG "*" :$nick"[:,]" "*)
+		CHANNEL=$2
+		prefix="PRIVMSG $CHANNEL :"
+		set -- "${@:4}"
+	;;
+
+	"PRIVMSG "*" :"*)
+		CHANNEL=$2
+		run_filters "${3#:}" "${@:4}" | while IFS= read -r line; do
+			send "PRIVMSG $CHANNEL :$line"
+		done &
+		continue
+	;;
+
+	*)
+		continue
+	;;
+
+	esac
+
+	# Prevent escaping from the PWD and being able to run commands such as ../../bin/su
+	cmd=${1##*/}
+	shift
+
+	# Built-in commands run in-process.
+	if [ -n "${builtin_commands[$cmd]}" ]; then
+		"${builtin_commands[$cmd]}" "$@"
+		continue
+	elif [ -x "commands/$cmd" ]; then
+		source "commands/$cmd" "$@"
+	else
+		# Log all commands that are not available, both for security auditing and finding potential new features.
+		"lib/cnf"
+		echo "`date`: User $NAME tried to run unavailable command $cmd" >> nac.log
+	fi | while IFS= read -r line; do
+		send "$prefix$line"
+	done &
+
+done <&3

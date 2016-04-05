@@ -1,0 +1,4 @@
+#!/bin/bash
+# Example of linking a script to a system program.
+
+/bin/date

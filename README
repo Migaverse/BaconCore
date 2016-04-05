@@ -1,0 +1,22 @@
+BaconCore NG 0.2
+A bot framework thing based off of bashbot.
+
+Preface
+In my free time, I created a bot framework called BaconCore, with the intention that it would be written entirely using Bash. It worked, surprisingly. However, adding functionality to it was, quite simply put, a pain. BaconCore NG is based off of bashbot, which makes adding functionality much simpler than it was before on the older, more crude BaconCore 0.1. It keeps with the goal of keeping it based on Bash, while being able to extend the functionality to my needs and made a much better base for modification.
+
+Requirements
+The botcore Azunyan should be able to run on almost any GNU/Linux based system. However, it was tested to work on the following:
+- Debian GNU/Linux 8.4 "Jessie"
+- GNU bash 4.3.30
+- GNU coreutils 8.23
+
+Modifications done for open source release
+The BaconCore botcore "Azunyan" was modified slightly to remove some commands as well as some code cleanup.
+
+How to use
+Simply modify the configuration for the 'core' that you want, then enable it with enabledcore and run baconcore-launcher.
+
+License
+BaconCore NG and Azunyan are licensed under the MIT license, please see COPYING for more details.
+
+If you use Azunyan/BaconCore, I'd like to hear about it (though it's not a requirement)!
