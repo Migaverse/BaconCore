@@ -4,7 +4,6 @@
 [ -n "$1" ] || { echo "usage: op <user>"; exit 1; }
 
 REQOP=`echo $RAWNAME | cut -d ":" -f2`
-#echo "$REQOP"
 
 if cat "$PWD/etc/opauthuser" | grep -q $REQOP
 then

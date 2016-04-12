@@ -1,0 +1,14 @@
+#!/bin/bash
+# Roll The Dice - very good RNG
+# Author: Ironchew
+
+maxRoll=100
+randSource=/dev/urandom
+randBytes=4
+randValue=$( head -c$randBytes $randSource | od -An -tu$randBytes )
+if [ $randValue -le $( echo "(2^(8*$randBytes)/$maxRoll)*$maxRoll" | bc ) ]
+then 
+	echo $(( ($randValue%$maxRoll)+1 ))
+else
+	echo "Invalid result. Roll again."
+fi

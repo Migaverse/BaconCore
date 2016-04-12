@@ -1,6 +1,32 @@
 #!/bin/bash
-# Makes the bot kek
+# Kekko - Makes the bot kek.
+# Authors: Ironchew, Miga
+# Copyright (c) 2016. Released under the GNU GPL version 3+.
 
-RNG=$((RANDOM % 150))
-kekko=`cat /dev/urandom | tr -dc "KEO" | head -c $RNG`
-printf "$kekko\n"
+if [[ $@ = "" ]]
+then
+	# If no string is provided, set instr to KEO for maximum kek
+	instr="KEO"
+else
+	# Use string provided to provides keks
+	instr="﻿$@"
+fi
+
+# Create a random number.
+RNG=$(( RANDOM % 25 ))
+
+# If our random number is 0, add 1 to it so there will be some output.
+if [[ $RNG = 0 ]]
+then
+	RNG=$(( RNG + 1 ))
+fi
+
+# Provide some keks.
+longstr=$( for (( i=0;i<RNG;i++ ))
+	do printf "$instr"
+	done );
+outstr=$( for (( i=0;i<${#longstr};i++ ))
+	do printf "${longstr:$i:1}\n"
+	done | shuf | tr -d '\n' );
+
+printf "$outstr\n"
