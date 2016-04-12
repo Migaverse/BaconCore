@@ -17,6 +17,6 @@ How to use
 Simply modify the configuration for the 'core' that you want, then enable it with enabledcore and run baconcore-launcher.
 
 License
-BaconCore NG and Azunyan are licensed under the MIT license, please see COPYING for more details.
+BaconCore NG and Azunyan are licensed under the GNU GPL license, please see COPYING for more details.
 
 If you use Azunyan/BaconCore, I'd like to hear about it (though it's not a requirement)!
